@@ -1,0 +1,26 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.intelliSenseEngineFallback": "enabled",
+  "C_Cpp.default.cStandard": "c11",
+  "C_Cpp.default.intelliSenseMode": "windows-clang-arm",
+  "C_Cpp.default.compilerPath": "D:/Software/Keil5/ARM/ARMCLANG/bin/armclang.exe",
+  "C_Cpp.default.compilerArgs": [
+    "--target=arm-arm-none-eabi",
+    "-mcpu=cortex-m3",
+    "-mthumb"
+  ],
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/Core/Inc",
+    "${workspaceFolder}/Application",
+    "${workspaceFolder}/Hardware",
+    "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
+    "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+    "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+    "${workspaceFolder}/Drivers/CMSIS/Include",
+    "D:/Software/Keil5/ARM/ARMCLANG/include"
+  ],
+  "C_Cpp.default.defines": [
+    "USE_HAL_DRIVER",
+    "STM32F103xB"
+  ]
+}

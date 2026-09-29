@@ -1,0 +1,30 @@
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "STM32F103",
+      "compilerPath": "D:/Software/Keil5/ARM/ARMCLANG/bin/armclang.exe",
+      "compilerArgs": [
+        "--target=arm-arm-none-eabi",
+        "-mcpu=cortex-m3",
+        "-mthumb"
+      ],
+      "cStandard": "c11",
+      "intelliSenseMode": "windows-clang-arm",
+      "includePath": [
+        "${workspaceFolder}/Core/Inc",
+        "${workspaceFolder}/Application",
+        "${workspaceFolder}/Hardware",
+        "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
+        "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+        "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+        "${workspaceFolder}/Drivers/CMSIS/Include",
+        "D:/Software/Keil5/ARM/ARMCLANG/include"
+      ],
+      "defines": [
+        "USE_HAL_DRIVER",
+        "STM32F103xB"
+      ]
+    }
+  ]
+}

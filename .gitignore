@@ -1,0 +1,28 @@
+# Keil / MDK-ARM 编译产物
+MDK-ARM/*/
+MDK-ARM/*.uvoptx
+MDK-ARM/*.uvguix.*
+MDK-ARM/*.lst
+
+# 编译生成的中间文件和固件
+*.o
+*.crf
+*.d
+*.dep
+*.axf
+*.hex
+*.map
+*.lnp
+*.htm
+
+# VS Code 本地缓存
+.vscode/ipch/
+.vscode/*.log
+
+# 临时文件
+~$*
+Thumbs.db
+
+# 第三方手册和参考资料
+mpu6050中文手册/
+docs/references/*.pdf
