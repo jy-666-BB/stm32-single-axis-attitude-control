@@ -26,4 +26,3 @@ void Attitude_Update(
     Attitude->Pitch =0.98f*(Attitude->Pitch+MPU6050->GyroY*dt)
     + 0.02f*AccPitch;
 }
-
