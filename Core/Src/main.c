@@ -186,7 +186,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if(htim->Instance == TIM3)
     {
 
-        MPU6050_GetData(&MPU6050_Data);
+        if (MPU6050_GetData(&MPU6050_Data) != MPU6050_OK)
+        {
+            return;
+        }
 
         Attitude_Update(
             &MPU6050_Data,

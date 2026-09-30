@@ -7,6 +7,14 @@
 
 #define MPU6050_ADDR 0x68
 
+
+
+typedef enum
+{
+    MPU6050_OK = 0,
+    MPU6050_ERROR_I2C = 1
+} MPU6050_Status_t;
+
 typedef struct
 {
 
@@ -41,7 +49,7 @@ void MPU6050_WriteReg(uint8_t RegAddress,uint8_t Data);
 
 uint8_t MPU6050_ReadReg(uint8_t RegAddress);
 
-void MPU6050_GetData(MPU6050_Data_t *Data);
+MPU6050_Status_t MPU6050_GetData(MPU6050_Data_t *Data);
 
 void MPU6050_Calibrate(void);
 #endif
