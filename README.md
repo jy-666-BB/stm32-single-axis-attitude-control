@@ -150,6 +150,10 @@ servo_angle = 90° + output
 MDK-ARM/AttitudeControl.uvprojx
 ```
 
+> **Keil 必须启用 MicroLIB。**
+>
+> 打开 Options for Target -> Target，勾选 Use MicroLIB。如果未勾选，printf 可能触发 ARM 半主机断点并停在 BKPT 0xAB，导致串口完全无输出。
+
 执行：
 
 ```text
