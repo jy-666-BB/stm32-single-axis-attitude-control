@@ -110,9 +110,19 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(200);    // 等待系统和MPU6050电源稳定
-  MPU6050_Init();
+  /* 初始化失败时停止启动，避免使用无效传感器数据 */
+  if (MPU6050_Init() != HAL_OK)
+  {
+    printf("MPU6050 init failed\r\n");
+    Error_Handler();
+  }
   HAL_Delay(1000);		//等待传感器稳定
-  MPU6050_Calibrate(); //陀螺仪和加速度计校准
+  /* 标定失败时停止启动，避免使用错误的姿态零偏 */
+  if (MPU6050_Calibrate() != HAL_OK)
+  {
+    printf("MPU6050 calibration failed\r\n");
+    Error_Handler();
+  }
   PID_Init(&Roll_PID,2.0f,0.0f,0.1f,45.0f);//初始化PID
   PWM_Start();
   Servo_SetAngle(90);
@@ -186,7 +196,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if(htim->Instance == TIM3)
     {
 
-        if (MPU6050_GetData(&MPU6050_Data) != MPU6050_OK)
+        /* 读取失败时跳过本次控制计算 */
+        if (MPU6050_GetData(&MPU6050_Data) != HAL_OK)
         {
             return;
         }
