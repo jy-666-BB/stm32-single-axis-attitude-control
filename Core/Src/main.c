@@ -57,8 +57,10 @@ Attitude_t Attitude;
 PID_t Roll_PID;
 float Servo_Output;
 float Servo_Angle;
-uint8_t print_flag=0;
-uint8_t print_cnt=0;
+volatile uint32_t tick_cnt = 0;      /* TIM3 中断产生的控制节拍数 */
+uint32_t tick_last = 0;     /* 主循环已经处理的控制节拍数 */
+uint32_t miss_cnt = 0;             /* 主循环来不及处理、被跳过的控制周期数 */
+uint8_t print_cnt = 0;                    /* 串口打印分频计数 */
 #define LOOP_DT 0.01f
 /*float Roll_Bias = 0;
 float Pitch_Bias = 0;*/
@@ -67,7 +69,7 @@ float Pitch_Bias = 0;*/
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void Control_Process(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -134,16 +136,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	if(print_flag)
-    {
-		printf("Roll=%.2f PID=%.2f Servo=%.2f\r\n",
-				Attitude.Roll,
-				Servo_Output,
-				Servo_Angle);
-        
-        print_flag=0;
-    } 
-	  
+    Control_Process();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -191,48 +185,59 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+/* 主循环中执行一次控制处理，实际的传感器读取和算法都在这里完成 */
+void Control_Process(void)
+{
+    uint32_t pending;
+    uint32_t now_tick = tick_cnt;
+
+    if (now_tick == tick_last)
+    {
+        return;
+    }
+
+    pending = now_tick - tick_last;
+    tick_last = now_tick;
+
+    /* 统计主循环没有及时处理的控制周期数 */
+    if (pending > 1)
+    {
+        miss_cnt += pending - 1;
+    }
+
+    /* 读取失败时跳过本次控制计算 */
+    if (MPU6050_GetData(&MPU6050_Data) != HAL_OK)
+    {
+        return;
+    }
+
+    Attitude_Update(&MPU6050_Data, &Attitude, LOOP_DT);
+
+    Servo_Output = PID_Calculate(&Roll_PID, 0.0f, Attitude.Roll, LOOP_DT);
+
+    Servo_Angle = 90.0f + Servo_Output;
+    if (Servo_Angle > 135.0f) Servo_Angle = 135.0f;
+    if (Servo_Angle < 45.0f) Servo_Angle = 45.0f;
+    Servo_SetAngle(Servo_Angle);
+
+    /* 每 10 个控制周期打印一次，约 10 Hz */
+    print_cnt++;
+    if (print_cnt >= 10)
+    {
+        print_cnt = 0;
+        printf("Roll=%.2f PID=%.2f Servo=%.2f\r\n",
+               Attitude.Roll,
+               Servo_Output,
+               Servo_Angle);
+    }
+}
+
+/* TIM3 中断只记录控制节拍，耗时处理全部移到主循环 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if(htim->Instance == TIM3)
+    if (htim->Instance == TIM3)
     {
-
-        /* 读取失败时跳过本次控制计算 */
-        if (MPU6050_GetData(&MPU6050_Data) != HAL_OK)
-        {
-            return;
-        }
-
-        Attitude_Update(
-            &MPU6050_Data,
-            &Attitude,
-            LOOP_DT
-        );
-
-		Servo_Output = PID_Calculate(
-				&Roll_PID,
-				0.0f,           //目标Roll
-				Attitude.Roll,  //当前Roll
-				0.01f);
-		
-		 // ===== PD控制舵机 =====
-        Servo_Angle = 90.0f + Servo_Output;
-
-        if(Servo_Angle > 135.0f)
-            Servo_Angle = 135.0f;
-
-        if(Servo_Angle < 45.0f)
-            Servo_Angle = 45.0f;
-
-        Servo_SetAngle(Servo_Angle);
-		
-		// ===== 降低打印频率 =====
-        print_cnt++;
-
-        if(print_cnt>=10)
-        {
-            print_flag=1;
-            print_cnt=0;
-        }
+        tick_cnt++;
     }
 }
 /* USER CODE END 4 */

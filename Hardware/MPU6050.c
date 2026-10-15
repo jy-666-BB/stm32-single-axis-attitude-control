@@ -44,7 +44,7 @@ HAL_StatusTypeDef MPU6050_Init(void)
 {
     uint8_t who_am_i = 0;
 
-    /* 需要依次配置的寄存器：采样率、低通滤波、陀螺仪量程、加速度计量程  */
+    /* 需要依次配置的寄存器：采样率、低通滤波、陀螺仪量程、加速度计量程 */
     const uint8_t regs[] = {0x19, 0x1A, 0x1B, 0x1C};
     const uint8_t vals[] = {0x07, 0x03, 0x00, 0x00};
 
